@@ -1,16 +1,19 @@
 import hjson
 import requests
 import os
-
+import sys
 from time import time
+
+sys.path.append(os.path.realpath(__file__))
+
 from _api import API_KEY
 
 BUILD_ADDRESS = True
 config = {}
 
-if os.path.exists('config.info'):
+if os.path.exists('/home/pi/Documents/Amadeus/config.info'):
     BUILD_ADDRESS = False
-    with open('config.info', 'r') as info_file:
+    with open('/home/pi/Documents/Amadeus/config.info', 'r') as info_file:
         config = hjson.load(info_file)
     if not config['address']:
         BUILD_ADDRESS = True
@@ -35,5 +38,5 @@ r = requests.get('http://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&u
 if r.status_code is 200:
     weather = hjson.loads(r.text)
     weather['timestamp'] = time()
-    with open('weather.json', 'w') as f:
+    with open('/home/pi/Documents/Amadeus/weather.json', 'w') as f:
         hjson.dump(weather, f)
