@@ -33,7 +33,7 @@ if BUILD_ADDRESS:
 
 r = requests.get('http://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&units=metric&appid={}'.format(config['lat'], config['lon'], API_KEY))
 if r.status_code is 200:
-    weather = json.loads(r.text)
+    weather = hjson.loads(r.text)
     weather['timestamp'] = time()
     with open('weather.json', 'w') as f:
         hjson.dump(weather, f)
