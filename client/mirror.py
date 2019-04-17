@@ -15,6 +15,7 @@ class mirror(QtGui.QMainWindow):
         self.stop_thread = threading.Event()
         self.w_thread = threading.Thread(target=self.check_for_weather, args=(self.stop_thread,))
         self.w_thread.start()
+        self.updateClock()
         self.clocktimer = QtCore.QTimer()
         self.clocktimer.timeout.connect(self.updateClock)
         self.clocktimer.start(1000)
