@@ -7,10 +7,12 @@ import hjson
 
 from PyQt4 import QtGui, QtCore, Qt, uic
 
+DIRECTORY = os.path.dirname(__file__)
+
 class mirror(QtGui.QMainWindow):
     def __init__(self):
         super(mirror, self).__init__()
-        uic.loadUi('mirror.ui', self)
+        uic.loadUi(os.path.join(DIRECTORY, 'mirror.ui'), self)
         self.showFullScreen()
         self.stop_thread = threading.Event()
         self.w_thread = threading.Thread(target=self.check_for_weather, args=(self.stop_thread,))
@@ -28,8 +30,8 @@ class mirror(QtGui.QMainWindow):
 
     def check_for_weather(self, stop_thread):
         while True and not stop_thread.isSet():
-            if os.path.exists('../weather.json'):
-                with open('../weather.json') as f:
+            if os.path.exists(os.path.join(DIRECTORY, '../weather.json')):
+                with open(os.path.join(DIRECTORY, '../weather.json')) as f:
                     data = hjson.load(f)
                 self.temp_lcd.display(float(data['main']['temp']))
                 self.hum_lcd.display(float(data['main']['humidity']))
