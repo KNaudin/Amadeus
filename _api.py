@@ -1,1 +1,1 @@
-API_KEY = "0287aa4a992ff218c756af9415225fba"
+API_KEY = "lol you thought"
