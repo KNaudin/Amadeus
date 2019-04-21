@@ -26,9 +26,10 @@ with microphone as source:
     recognizer.adjust_for_ambient_noise(source)
     # Amadeus says 'Hello!' at the startup
     amadeus_answers['hello'].play()
+    print('Hello!')
+    print('You can start talking :)')
     while not stop_recording:
         listening_to_command = False
-        print('Dites quelque chose.')
         # Listen to any audio from the microphone, resets every 5 seconds to not be stuck in a noise loop
         try:
             audio = recognizer.listen(source, timeout=5)
@@ -40,18 +41,18 @@ with microphone as source:
             transcription = recognizer.recognize_google(audio, language='fr-FR')
             if GIVEN_NAME in transcription:
                 listening_to_command = True
-                print('Amadeus is listening.')
+                print('Yes?')
                 # Amadeus says 'はい' / 'hai' / 'yes' so we know it's listening
                 amadeus_answers['yes'].play()
                 audio = recognizer.listen(source, timeout=10)
                 command = recognizer.recognize_google(audio, language='fr-FR')
-                print('Amadeus heard: {}'.format(command))
+                print('This is what I heard: {}'.format(command))
         # If the API can't process because of a connection error
         except sr.RequestError:
-            print('API unavailable')
+            print('The API is unavailable.')
         # If the API can't process because it can't understand the audio
         except sr.UnknownValueError:
-            print('Unable to recognize speech')
+            print('Sorry. I can\'t understand what you\'re trying to say.')
             # Amadeus says 'ごめん' / 'gomen' / 'sorry' so we know it didn't get what we're trying to say
             if listening_to_command:
                 amadeus_answers['sorry'].play()
