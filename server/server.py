@@ -14,10 +14,10 @@ from pytradfri.error import PytradfriError
 from pytradfri.gateway import Gateway
 from pytradfri.command import Command
 
-global API, LIGHT
+global API, LIGHT, my_groups
 
 class ServerHandler(BaseHTTPRequestHandler):
-    global API, LIGHT
+    global API, LIGHT, my_groups
     #envoi code de reponse
     def _set_response(self, code):
         self.send_response(code)
@@ -33,9 +33,10 @@ class ServerHandler(BaseHTTPRequestHandler):
         try:
             command = data['command']
             group = data['group']
+            light = data['light']
             color = data['color']
-            intensity = data['intensity']
-            logging.info("Command: {}, Group: {}, Color: {}, Intensity: {}".format(command, group, color, intensity))
+            dimmer = data['dimmer']
+            logging.info("Command: {}, Group: {}, Light:{}, Color: {}, Dimmer: {}".format(command, group, light, color, dimmer))
             print('salut')
             print(API)
             API(LIGHT.light_control.set_dimmer(intensity))
@@ -43,16 +44,28 @@ class ServerHandler(BaseHTTPRequestHandler):
         except:
             self._set_response(400)
         
+        self.wfile.write("POST request for {}\n".format(self.path).encode('utf-8'))
+    
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        try:
+            if self.path.endswith("info"):
+                self.wfile.write(b'Info requested.\n')
+        except IOError:
+            self.send_error(404, 'File Not Found: %s' %self.path)
+    
         
-        self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
-
 #lance le serveur sur le port 8080 et ecoute les requetes
 def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
-    global API, LIGHT
+    global API, LIGHT, my_groups
+    my_groups = {}
+    
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     logging.info('Starting httpd...\n')
+    
     if os.path.exists('./gateway.conf'):
         with open('./gateway.conf') as f:
             data = hjson.load(f)
@@ -63,22 +76,22 @@ def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
             api_factory = APIFactory(host=ip, psk_id=identity, psk=key)
             
             API = api_factory.request
-            print(API)
             gateway = Gateway()
-            devices_commands = API(gateway.get_devices())
-            devices = API(devices_commands)
-            lights = [dev for dev in devices if dev.has_light_control]
-            if lights:
-                LIGHT = lights[0]
-            else:
-                print("No lights found!")
-                LIGHT = None
-            groups = API(gateway.get_groups())
+            groups = API(gateway.get_groups())            
             if groups:
-                group = groups[0]
+                for group in groups:
+                    my_groups[API(group).name]=API(group)
+                group_members = my_groups['salon'].member_ids
+                group_lights = [API(gateway.get_device(group_members[i])) for i in range(0, len(group_members))]
+                API(group_lights[0].light_control.set_dimmer(0))
             else:
                 print("No groups found!")
                 group = None
+            if group_lights:
+                LIGHT = group_lights[0]
+            else:
+                print("No lights found!")
+                LIGHT = None
             moods = API(gateway.get_moods())
             if moods:
                 mood = moods[0]
@@ -88,7 +101,13 @@ def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
             tasks = API(gateway.get_smart_tasks())
             homekit_id = API(gateway.get_gateway_info()).homekit_id
             logging.info('Connected to the gateway!')
-        except:
+            
+            data = {'group': list(my_groups.keys())[0], 'light': { 'id' : group_members[0], 'dimmer':'', 'color':'' }}
+            with open('./info.json', 'w') as f:
+                hjson.dump(data, f)
+            
+        except Exception as e:
+            print(str(e))
             raise PytradfriError("Could not connect to the gateway. Please run configure.py before running the server.")
     else:
         raise FileNotFoundError('Please run configure.py before running the server.')
