@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""
-Very simple HTTP server in python for logging requests
-Usage::
-    ./server.py [<port>]
-"""
+
 import logging
 import os
 import hjson
+import json
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pytradfri.api.libcoap_api import APIFactory
@@ -14,10 +11,10 @@ from pytradfri.error import PytradfriError
 from pytradfri.gateway import Gateway
 from pytradfri.command import Command
 
-global API, LIGHT, my_groups
+global API, LIGHT, my_groups, my_group_members
 
 class ServerHandler(BaseHTTPRequestHandler):
-    global API, LIGHT, my_groups
+    global API, LIGHT, my_groups, my_group_members
     #envoi code de reponse
     def _set_response(self, code):
         self.send_response(code)
@@ -37,8 +34,6 @@ class ServerHandler(BaseHTTPRequestHandler):
             color = data['color']
             dimmer = data['dimmer']
             logging.info("Command: {}, Group: {}, Light:{}, Color: {}, Dimmer: {}".format(command, group, light, color, dimmer))
-            print('salut')
-            print(API)
             API(LIGHT.light_control.set_dimmer(intensity))
             self._set_response(200)
         except:
@@ -51,16 +46,19 @@ class ServerHandler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             if self.path.endswith("info"):
-                self.wfile.write(b'Info requested.\n')
+                with open('./info.json') as f:
+                    data = hjson.load(f)
+                self.wfile.write(json.dumps(data).encode())
         except IOError:
             self.send_error(404, 'File Not Found: %s' %self.path)
     
         
 #lance le serveur sur le port 8080 et ecoute les requetes
 def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
-    global API, LIGHT, my_groups
+    global API, my_groups, my_group_members
     my_groups = {}
-    
+    my_group_members = {}
+    device_info = {'groups':[]}
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
@@ -80,31 +78,28 @@ def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
             groups = API(gateway.get_groups())            
             if groups:
                 for group in groups:
-                    my_groups[API(group).name]=API(group)
-                group_members = my_groups['salon'].member_ids
-                group_lights = [API(gateway.get_device(group_members[i])) for i in range(0, len(group_members))]
-                API(group_lights[0].light_control.set_dimmer(0))
+                    my_groups[API(group).name]=API(group) #creation dictionnaire {group_name : group}
+                    my_group_members[API(group).name] = API(group).member_ids #creation dictionnaire {groupe_name : [ids]}
+                #group_lights = [API(gateway.get_device(my_group_members['salon'][i])) for i in range(0, len(my_group_members['salon']))]
+                #print(group_lights[0].light_control.lights[0].dimmer)
             else:
                 print("No groups found!")
                 group = None
-            if group_lights:
-                LIGHT = group_lights[0]
-            else:
-                print("No lights found!")
-                LIGHT = None
-            moods = API(gateway.get_moods())
-            if moods:
-                mood = moods[0]
-            else:
-                print("No moods found!")
-                mood = None
-            tasks = API(gateway.get_smart_tasks())
-            homekit_id = API(gateway.get_gateway_info()).homekit_id
+            
             logging.info('Connected to the gateway!')
             
-            data = {'group': list(my_groups.keys())[0], 'light': { 'id' : group_members[0], 'dimmer':'', 'color':'' }}
+            #creation du fichier d'info sur les devices
+            for i in range(0, len(list(my_groups.keys()))):
+                group =  { 'id': list(my_groups.keys())[i], 'lights': [] }
+                for j in range(0, len(my_group_members)):
+                    id = my_group_members[group['id']][j]
+                    dimmer = API(gateway.get_device(id)).light_control.lights[0].dimmer
+                    color = API(gateway.get_device(id)).light_control.lights[0].hex_color
+                    light = { 'id' : id, 'dimmer':dimmer, 'color':color}
+                    group['lights'].append(light)
+                device_info['groups'].append(group)
             with open('./info.json', 'w') as f:
-                hjson.dump(data, f)
+                hjson.dump(device_info, f)
             
         except Exception as e:
             print(str(e))
