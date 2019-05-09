@@ -1,6 +1,7 @@
 {
-  'command':'allumer',
+  'command':'',
   'group':'salon',
-  'color':'',
-  'intensity':254
+  'light':65537,
+  'color':'da5d41',
+  'dimmer':100
 }
