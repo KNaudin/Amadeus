@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.amadeus.domotique">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/amadeus_launcher"
@@ -9,6 +11,7 @@
         android:roundIcon="@drawable/amadeus_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ConnectionActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
