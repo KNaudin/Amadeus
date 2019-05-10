@@ -48,19 +48,15 @@ class ServerHandler(BaseHTTPRequestHandler):
                 logging.info(light)
             
             if command=="on":
-                #set dimmer: 100
                 if (group and light) or light:
-                    API(light.light_control.set_dimmer(100))
+                    API(light.light_control.set_state(1))
                 elif group:
                     API(group.set_state(1))
-                    logging.info(group)
             elif command=="off":
-                #set dimmer: 0
                 if (group and light) or light:
-                    API(light.light_control.set_dimmer(0))
+                    API(light.light_control.set_state(0))
                 elif group:
                     API(group.set_state(0))
-                    logging.info(group)
             elif dimmer_value:
                 #set dimmer: value
                 if (group and light) or light:
@@ -70,9 +66,9 @@ class ServerHandler(BaseHTTPRequestHandler):
             if color_value:
                 #set hex_color: value
                 if (group and light) or light:
-                    logging.info(API(light.light_control.set_hex_color(color_value)))
+                    API(light.light_control.set_hex_color(color_value))
                 elif group:
-                    logging.info(API(group.set_hex_color(color_value)))
+                    API(group.set_hex_color(color_value))
             
             self._set_response(200)
         except Exception as e:
