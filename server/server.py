@@ -36,23 +36,19 @@ class ServerHandler(BaseHTTPRequestHandler):
             color_value = data['color']
             dimmer_value = data['dimmer']
             logging.info("Command: {}, Group: {}, Light:{}, Color: {}, Dimmer: {}".format(command, group_name, light_id, color_value, dimmer_value))
-            
             group = None
             light = None
             #traitement de la requette POST
             if group_name:
                 group = my_groups[group_name]
-                logging.info(group)
             if light_id:
                 light = API(gateway.get_device(light_id))
-                logging.info(light)
-            
             if command=="on":
                 if (group and light) or light:
                     API(light.light_control.set_state(1))
                 elif group:
                     API(group.set_state(1))
-            elif command=="off":
+            elif command=="off" or dimmer_value == 0:
                 if (group and light) or light:
                     API(light.light_control.set_state(0))
                 elif group:
@@ -69,7 +65,6 @@ class ServerHandler(BaseHTTPRequestHandler):
                     API(light.light_control.set_hex_color(color_value))
                 elif group:
                     API(group.set_hex_color(color_value))
-            
             self._set_response(200)
         except Exception as e:
             logging.info(str(e))
