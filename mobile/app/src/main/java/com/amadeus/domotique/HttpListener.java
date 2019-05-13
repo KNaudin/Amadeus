@@ -17,9 +17,9 @@ public class HttpListener {
         this.subscribers.add(app);
     }
 
-    public void notifySubs(JSONObject obj, boolean correctReturn){
+    public void notifySubs(JSONObject obj, int returnCode){
         for(Notifyable app : this.subscribers){
-            app.getNotification(obj, correctReturn);
+            app.getNotification(obj, returnCode);
         }
     }
 }

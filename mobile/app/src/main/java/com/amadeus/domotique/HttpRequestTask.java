@@ -20,19 +20,21 @@ import java.util.Scanner;
 public class HttpRequestTask extends AsyncTask<URI, Void, Void> {
 
     private ProgressDialog progDailog;
-    private boolean connectionSet = false;
+    private int returnCode = 1;
     private HttpListener listener;
     private JSONObject returnedObject = null;
     private Context context;
     private boolean showLoading;
     private String charge;
+    private int timeout;
 
 
-    public HttpRequestTask(HttpListener listener, Context context, boolean showLoading, String charge){
+    public HttpRequestTask(HttpListener listener, Context context, boolean showLoading, String charge, int timeout){
         this.listener = listener;
         this.context = context;
         this.showLoading = showLoading;
         this.charge = charge;
+        this.timeout = timeout;
         System.out.println("[AMADEUS] Charge: "+this.charge);
     }
 
@@ -54,7 +56,7 @@ public class HttpRequestTask extends AsyncTask<URI, Void, Void> {
         super.onPostExecute(unused);
         if(this.showLoading)
             progDailog.dismiss();
-        listener.notifySubs(this.returnedObject, this.connectionSet);
+        listener.notifySubs(this.returnedObject, this.returnCode);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class HttpRequestTask extends AsyncTask<URI, Void, Void> {
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             if(charge.equals("")) {
                 HttpURLConnection.setFollowRedirects(false);
-                urlConnection.setConnectTimeout(5 * 1000);
+                urlConnection.setConnectTimeout(this.timeout * 1000);
                 urlConnection.setRequestMethod("GET");
                 System.out.println("[AMADEUS] GET Code de retour du serveur: " + urlConnection.getResponseCode());
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -72,7 +74,7 @@ public class HttpRequestTask extends AsyncTask<URI, Void, Void> {
                 String result = s.hasNext() ? s.next() : "";
                 System.out.println("[AMADEUS] Réponse du serveur " + result);
                 this.returnedObject = new JSONObject(result);
-                connectionSet = true;
+                this.returnCode = 0;
                 urlConnection.disconnect();
             }
             else{

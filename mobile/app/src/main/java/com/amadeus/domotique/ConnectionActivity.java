@@ -67,7 +67,7 @@ public class ConnectionActivity extends AppCompatActivity implements Notifyable,
                     String address = this.text_ip.getText().toString();
                     if(address != null && address != "") {
                         URI uri = new URI("HTTP", null, address, port, "/info", null, null);
-                        HttpRequestTask requestTask = new HttpRequestTask(this.listener, ConnectionActivity.this, true, "");
+                        HttpRequestTask requestTask = new HttpRequestTask(this.listener, ConnectionActivity.this, true, "", 5);
                         requestTask.execute(uri);
                     }
                 }
@@ -80,9 +80,9 @@ public class ConnectionActivity extends AppCompatActivity implements Notifyable,
     }
 
     @Override
-    public void getNotification(JSONObject obj, boolean correctReturn) {
-        System.out.println("[AMADEUS] Valeur de retour de la connexion: "+correctReturn);
-        if(correctReturn){
+    public void getNotification(JSONObject obj, int returnCode) {
+        System.out.println("[AMADEUS] Valeur de retour de la connexion: "+returnCode);
+        if(returnCode == 0){
             Intent data = new Intent();
             data.putExtra("IP", this.text_ip.getText().toString());
             data.putExtra("PORT", Integer.parseInt(this.text_port.getText().toString()));

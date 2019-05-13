@@ -1,5 +1,6 @@
 package com.amadeus.domotique;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.camera2.TotalCaptureResult;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +31,8 @@ import java.net.URI;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Notifyable, View.OnClickListener {
 
+    public static int screenWidth;
+
     private String serverIP = "";
     private int serverPort = 8080;
     private HttpListener listener;
@@ -50,6 +54,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        MainActivity.screenWidth = displayMetrics.widthPixels;
         if(settings.getAll().isEmpty()){
             Toast.makeText(this, "Aucune donnée utilisateur trouvée.", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(MainActivity.this, ConnectionActivity.class);
@@ -64,28 +72,10 @@ public class MainActivity extends AppCompatActivity
         this.listener = new HttpListener();
         listener.subscribe(this);
 
-//        button_light = findViewById(R.id.button_light);
-//        button_light.setOnClickListener(this);
-
-        LinearLayout mainLayout = findViewById(R.id.main_layout);
-        SourceManagement src_man = new SourceManagement(MainActivity.this, mainLayout, "Salon", 200);
-    }
-
-    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.button_light: {
-//                try{
-//                    URI uri = new URI("HTTP", null, this.serverIP, this.serverPort, "/", null, null);
-//                    HttpRequestTask requestTask = new HttpRequestTask(this.listener, MainActivity.this, false,
-//                            "{\"command\":\"\",\"group\":\"salon\",\"light\":\"\",\"color\":\"\",\"dimmer\":10}");
-//                    requestTask.execute(uri);
-//                }
-//                catch (Exception e){
-//                    System.out.println("[AMADEUS] "+e.getMessage());
-//                }
-//                break;
-//            }
-//        }
+        SourceManagement src_salon = new SourceManagement(this,MainActivity.this, "salon", 200, true);
+        src_salon.addItem("65538", 125);
+        src_salon.addItem("666", 42);
+        SourceManagement src_lampe = new SourceManagement(this,MainActivity.this, "65537", 10, false);
     }
 
     @Override
@@ -169,7 +159,30 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void getNotification(JSONObject obj, boolean correctReturn) {
-        System.out.println(obj);
+    public void getNotification(JSONObject obj, int returnCode) {
+        switch (returnCode){
+            case 0:{
+                System.out.println("[AMADEUS] Mise à jour "+obj);
+                break;
+            }
+            case -1:{
+                try{
+                    System.out.println("[AMADEUS] Envoie des infos: "+obj);
+                    URI uri = new URI("HTTP", null, this.serverIP, this.serverPort, "/", null, null);
+                    HttpRequestTask requestTask = new HttpRequestTask(this.listener, MainActivity.this, false,
+                            obj.toString(), 1);
+                    requestTask.execute(uri);
+                }
+                catch (Exception e){
+                    System.out.println("[AMADEUS] "+e.getMessage());
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }
