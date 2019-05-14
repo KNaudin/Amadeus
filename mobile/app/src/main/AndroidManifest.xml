@@ -11,6 +11,7 @@
         android:roundIcon="@drawable/amadeus_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ColorPickActivity"></activity>
         <activity android:name=".ConnectionActivity" />
         <activity
             android:name=".MainActivity"

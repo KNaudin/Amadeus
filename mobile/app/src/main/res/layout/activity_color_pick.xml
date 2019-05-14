@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ColorPickActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/colorPrimary" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="0">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image13"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/cool_white"
+                    android:tag="f5faf6"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image16"
+                    android:tag="eaf6fb"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/cool_daylight"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image8"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/cold_sky"
+                    android:tag="dcf0f8"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image9"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/light_blue"
+                    android:tag="6c83ba"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image10"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/blue"
+                    android:tag="4a418a"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="0">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image14"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/sunrise"
+                    android:tag="f2eccf"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image3"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/warm_white"
+                    android:tag="f1e0b5"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image4"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/warm_glow"
+                    android:tag="efd275"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/candlelight"
+                    android:tag="ebb63e"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image11"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/warm_amber"
+                    android:tag="e78834"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="0"
+                android:onClick="getColor">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image12"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/light_pink"
+                    android:tag="e8bedd"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image15"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/pink"
+                    android:tag="e491af"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image5"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/light_purple"
+                    android:tag="c984bb"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image6"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/saturated_pink"
+                    android:tag="d9337c"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image7"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/saturated_purple"
+                    android:tag="8f2686"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_weight="0">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image17"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/yellow"
+                    android:tag="d6e44b"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image18"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/lime"
+                    android:tag="a9d62b"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image19"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/peach"
+                    android:tag="e57345"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image20"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/dark_peach"
+                    android:tag="da5d41"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image21"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:onClick="getColor"
+                    android:src="@drawable/saturated_red"
+                    android:tag="dc4b31"
+                    app:civ_border_color="#FF000000"
+                    app:civ_border_width="1dp" />
+            </TableRow>
+
+        </TableLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -3,6 +3,7 @@ package com.amadeus.domotique;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class SourceManagement extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
     private Context context;
-    private AppCompatActivity parent;
+    private MainActivity parent;
     private String name = "";
     private String showName = "";
     private String groupPrint = "Lumière";
@@ -36,7 +37,7 @@ public class SourceManagement extends AppCompatActivity implements SeekBar.OnSee
 
     final private LinearLayout itemsLayout;
 
-    public SourceManagement(AppCompatActivity parent, Context mainContext, String name, int defaultValue, boolean isGroup){
+    public SourceManagement(MainActivity parent, Context mainContext, String name, int defaultValue, boolean isGroup, int resource){
         this.ids = new HashMap<>();
         this.slidingSliders = new HashMap<>();
         this.slidersValue = new HashMap<>();
@@ -71,37 +72,49 @@ public class SourceManagement extends AppCompatActivity implements SeekBar.OnSee
         mainSrcButton.setId(View.generateViewId());
         SeekBar mainSeekBar = (SeekBar) ((ViewGroup)firstItemLayout).getChildAt(0);
         mainSeekBar.setId(View.generateViewId());
-        ImageView mainColor = (ImageView)  ((ViewGroup)firstItemLayout).getChildAt(1);
+        de.hdodenhof.circleimageview.CircleImageView mainColor = (de.hdodenhof.circleimageview.CircleImageView)  ((ViewGroup)firstItemLayout).getChildAt(1);
         mainColor.setId(View.generateViewId());
 
         mainSrcButton.setText(this.showName);
         mainSeekBar.setProgress(defaultValue);
         mainSeekBar.setMax(254);
         mainSeekBar.setOnSeekBarChangeListener(this);
+        mainSeekBar.getLayoutParams().width = (int) (MainActivity.screenWidth * 0.6);
 
         mainSrcButton.setOnClickListener(this);
         mainColor.setOnClickListener(this);
+
+        mainColor.setImageResource(resource);
+        mainColor.setBorderWidth((int) this.context.getResources().getDimension(android.R.dimen.notification_large_icon_width)/100);
+        mainColor.getLayoutParams().width = (int) this.context.getResources().getDimension(android.R.dimen.notification_large_icon_width);
+        mainColor.getLayoutParams().height = (int) this.context.getResources().getDimension(android.R.dimen.notification_large_icon_height);
 
         this.addId(mainSrcButton, Button.class, this.groupPrint, this.name);
         this.addId(mainSeekBar, SeekBar.class, this.groupPrint, this.name);
         this.addId(mainColor, ImageView.class, this.groupPrint, this.name);
         this.setSliding(mainSeekBar, false);
         this.setSliderValue(mainSeekBar, defaultValue);
+
+        this.itemsLayout.getLayoutParams().width = LinearLayout.LayoutParams.MATCH_PARENT;
     }
 
-    public void addItem(String name, int defaultValue){
+    public void addItem(String name, int lightValue, int resource){
         LinearLayout hLayout = new LinearLayout(this.context);
         hLayout.setOrientation(LinearLayout.HORIZONTAL);
         TextView label = new TextView(this.context);
         label.setText("Lampe "+name);
         SeekBar seekBar = new SeekBar(this.context);
-        seekBar.setProgress(defaultValue);
         seekBar.setMax(254);
-        ImageView colorBox = new ImageView(this.context);
-        colorBox.setImageResource(android.R.color.holo_blue_dark);
+        seekBar.setProgress(lightValue);
+        de.hdodenhof.circleimageview.CircleImageView colorBox = new de.hdodenhof.circleimageview.CircleImageView(this.context);
+        colorBox.setImageResource(resource);
+        colorBox.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        colorBox.setBorderWidth((int) this.context.getResources().getDimension(android.R.dimen.notification_large_icon_width)/100);
         hLayout.addView(label);
         hLayout.addView(seekBar);
         hLayout.addView(colorBox);
+
+        System.out.println(seekBar.getProgress());
 
         this.itemsLayout.addView(hLayout);
 
@@ -118,7 +131,7 @@ public class SourceManagement extends AppCompatActivity implements SeekBar.OnSee
         this.addId(seekBar, SeekBar.class, "Lumière", name);
         this.addId(colorBox, ImageView.class, "Lumière", name);
         this.setSliding(seekBar, false);
-        this.setSliderValue(seekBar, defaultValue);
+        this.setSliderValue(seekBar, lightValue);
 
         colorBox.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(this);
@@ -216,6 +229,8 @@ public class SourceManagement extends AppCompatActivity implements SeekBar.OnSee
                 break;
             }
             case "android.widget.ImageView":{
+                Identity identity = this.getIdentityByID(v.getId());
+                this.parent.askForColor(v, identity.getType().equals("Lumière"), identity.getName());
                 break;
             }
         }
