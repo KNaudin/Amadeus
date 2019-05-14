@@ -11,10 +11,10 @@ from pytradfri.error import PytradfriError
 from pytradfri.gateway import Gateway
 from pytradfri.command import Command
 
-global API, LIGHT, my_groups, my_group_members, gateway
+global API, LIGHT, my_groups, my_group_members, gateway, device_info
 
 class ServerHandler(BaseHTTPRequestHandler):
-    global API, my_groups, my_group_members, gateway
+    global API, my_groups, my_group_members, gateway, device_info
     
     #envoi code de reponse
     def _set_response(self, code):
@@ -37,10 +37,16 @@ class ServerHandler(BaseHTTPRequestHandler):
             dimmer_value = data['dimmer']
             logging.info("Command: {}, Group: {}, Light:{}, Color: {}, Dimmer: {}".format(command, group_name, light_id, color_value, dimmer_value))
             group = None
+            group_lights = None
             light = None
+            groups = []
+            lights = []
+
+            
             #traitement de la requette POST
             if group_name:
                 group = my_groups[group_name]
+                group_lights = [API(gateway.get_device(my_group_members[group_name][i])) for i in range(0, len(my_group_members[group_name]))]
             if light_id:
                 light = API(gateway.get_device(light_id))
             if command=="on":
@@ -58,18 +64,32 @@ class ServerHandler(BaseHTTPRequestHandler):
                 if (group and light) or light:
                     API(light.light_control.set_dimmer(dimmer_value))
                 if group:
-                    API(group.set_dimmer(dimmer_value))
+                    for i in range(0, len(group_lights)):
+                        API(group_lights[i].light_control.set_dimmer(dimmer_value))
             if color_value:
                 #set hex_color: value
                 if (group and light) or light:
                     API(light.light_control.set_hex_color(color_value))
                 elif group:
-                    API(group.set_hex_color(color_value))
+                    for i in range(0, len(group_lights)):
+                        API(group_lights[i].light_control.set_hex_color(color_value))
             self._set_response(200)
         except Exception as e:
             logging.info(str(e))
             self._set_response(400)
         
+        for group in device_info['groups']:
+            for light in group['lights']:
+                if light['id']==light_id or group['id']==group_name:
+                    if dimmer_value:
+                        light['dimmer'] = dimmer_value
+                    elif color_value:
+                        light['color'] = color_value
+                lights.append(light)
+            group['lights']=lights
+            groups.append(group)
+        device_info['groups']=groups
+
         self.wfile.write("POST request for {}\n".format(self.path).encode('utf-8'))
     
     #recupere les requetes GET et renvoi un fichier json si elle fini par /info
@@ -78,16 +98,14 @@ class ServerHandler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             if self.path.endswith("info"):
-                with open('./info.json') as f:
-                    data = hjson.load(f)
-                self.wfile.write(json.dumps(data).encode())
+                self.wfile.write(json.dumps(device_info).encode())
         except IOError:
             self.send_error(404, 'File Not Found: %s' %self.path)
     
         
 #lance le serveur sur le port 8080 et ecoute les requetes
 def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
-    global API, my_groups, my_group_members, gateway
+    global API, my_groups, my_group_members, gateway, device_info
     my_groups = {}
     my_group_members = {}
     device_info = {'groups':[]}
@@ -112,8 +130,6 @@ def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
                 for group in groups:
                     my_groups[API(group).name] = API(group) #creation dictionnaire {group_name : group}
                     my_group_members[API(group).name] = API(group).member_ids #creation dictionnaire {groupe_name : [ids]}
-                #group_lights = [API(gateway.get_device(my_group_members['salon'][i])) for i in range(0, len(my_group_members['salon']))]
-                #print(API(group_lights[0].light_control.set_dimmer(0)))
             else:
                 print("No groups found!")
                 group = None
@@ -130,8 +146,6 @@ def run(server_class=HTTPServer, handler_class=ServerHandler, port=8080):
                     light = { 'id' : id, 'dimmer':dimmer, 'color':color}
                     group['lights'].append(light)
                 device_info['groups'].append(group)
-            with open('./info.json', 'w') as f:
-                hjson.dump(device_info, f)
             
         except Exception as e:
             print(str(e))
